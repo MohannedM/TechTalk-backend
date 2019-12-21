@@ -5,6 +5,7 @@ const User = require("../../modules/user");
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
 const sendGripApi = require("../../env-variables").sendGripApi;
+const jwtKey = require("../../env-variables").jwtKey;
 
 const transporter = nodemailer.createTransport(sendgridTransport({
     auth: {
@@ -81,22 +82,42 @@ module.exports = {
             error.data = errors;
             throw error;
         }
-
+        const tokenExpiration = new Date().getTime() + 3600000;
         const token = jwt.sign({
             _id: exisitingUser._id,
             is_admin: exisitingUser.is_admin,
-        }, "supersecret");
+            expiration: tokenExpiration
+        }, jwtKey);
 
         return {
             token,
             user: {
                 _id: exisitingUser._id.toString(),
                 ...exisitingUser._doc
-            }
+            },
+            expiration: tokenExpiration
+
         }
-
-
-
+    },
+    getUserData: async function({token}, req){
+        const decodedToken =  jwt.verify(token, jwtKey);
+        if(decodedToken.expiration < new Date()){
+            const error = new Error("Token is expired");
+            error.code = 401;
+            error.data = "Token is expired";
+            throw error;
+        }
+        const user = await User.findById(decodedToken._id);
+        if(!user){
+            const error = new Error("User doesn't exist");
+            error.code = 401;
+            error.data = "User doesn't exist";
+            throw error;
+        }
+        return {
+            ...user._doc,
+            _id: user._id.toString(),
+        }
     },
     isEmailTaken: async function({email}, req){
         const exisitingUser = await User.findOne({email});

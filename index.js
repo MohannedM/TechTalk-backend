@@ -5,6 +5,7 @@ const graphqlHttp = require('express-graphql');
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
 const bodyParser = require("body-parser");
+const mongoDBKey = require("./env-variables").mongoDBKey;
 
 app.use(bodyParser.json());
 
@@ -39,7 +40,7 @@ app.use("/graphql", graphqlHttp({
 
 
 
-mongoose.connect("mongodb+srv://mohannedm:zip123@cluster0-usvsi.mongodb.net/techtalk?retryWrites=true&w=majority")
+mongoose.connect(mongoDBKey)
 .then(()=>{
     app.listen(8080);
 });

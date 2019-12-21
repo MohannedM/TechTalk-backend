@@ -16,8 +16,9 @@ module.exports = buildSchema(`
     }
 
     type authData{
-        token: String!,
+        token: String!
         user: User!
+        expiration: String!
     }
 
     type RootMutation{
@@ -27,6 +28,7 @@ module.exports = buildSchema(`
 
     type RootQuery{
         login(email: String!, password: String!): authData!
+        getUserData(token: String!): User!
     }
 
     schema {
