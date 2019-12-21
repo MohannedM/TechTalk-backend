@@ -4,10 +4,11 @@ const jwt = require("jsonwebtoken");
 const User = require("../../modules/user");
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
+const sendGripApi = require("../../env-variables").sendGripApi;
 
 const transporter = nodemailer.createTransport(sendgridTransport({
     auth: {
-        api_key: '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'
+        api_key: sendGripApi
     }
 }))
 module.exports = {
