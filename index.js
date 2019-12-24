@@ -6,6 +6,7 @@ const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
 const bodyParser = require("body-parser");
 const mongoDBKey = require("./env-variables").mongoDBKey;
+const auth = require("./middleware/auth");
 
 app.use(bodyParser.json());
 
@@ -19,7 +20,7 @@ app.use((req, res, next)=>{
     next();
 });
 
-
+app.use(auth);
 
 app.use("/graphql", graphqlHttp({
     schema: graphqlSchema,

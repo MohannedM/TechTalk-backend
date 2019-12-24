@@ -84,7 +84,7 @@ module.exports = {
         }
         const tokenExpiration = new Date().getTime() + 3600000;
         const token = jwt.sign({
-            _id: exisitingUser._id,
+            userId: exisitingUser._id,
             is_admin: exisitingUser.is_admin,
             expiration: tokenExpiration
         }, jwtKey);
@@ -107,7 +107,7 @@ module.exports = {
             error.data = "Token is expired";
             throw error;
         }
-        const user = await User.findById(decodedToken._id);
+        const user = await User.findById(decodedToken.userId);
         if(!user){
             const error = new Error("User doesn't exist");
             error.code = 401;

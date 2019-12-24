@@ -1,5 +1,6 @@
-const authResolvers = require("./resolvers/auth");
+const authResolvers = require("./wrappers/auth");
+const postsResolvers = require("./wrappers/posts");
 module.exports = {
     ...authResolvers,
-
+    ...postsResolvers
 }
