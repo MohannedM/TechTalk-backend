@@ -7,6 +7,13 @@ const graphqlResolver = require("./graphql/resolvers");
 const bodyParser = require("body-parser");
 const mongoDBKey = require("./env-variables").mongoDBKey;
 const auth = require("./middleware/auth");
+const multer = require("multer");
+const uuidv4 = require("uuid/v4");
+const path = require("path");
+
+
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(bodyParser.json());
 
@@ -21,6 +28,36 @@ app.use((req, res, next)=>{
 });
 
 app.use(auth);
+
+const storage = multer.diskStorage({
+    destination(req, file, cb){
+        cb(null, 'images')
+    },
+    filename(req, file, cb){
+        cb(null, uuidv4());
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if(!req.isAuth) return cb(null, false);
+    if(file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg"){
+        cb(null, true);
+    }else{
+        cb(null, false);
+    }
+}
+app.use(multer({storage, fileFilter}).single('image'));
+
+app.put("/post/add-image", (req,res,next)=>{
+    if(req.isAuth && req.file){
+        const imageUrl = req.file.path.replace("\\" ,"/");
+        imageUrl ? res.status(200).json({imageUrl}) : res.status(400).json({error: "Image upload failed"});
+        return; 
+    }else if(!req.file){
+        res.status(400).json({message: "An error occured"});
+    }
+    res.status(401).json({message: "Unauthorized"});
+});
 
 app.use("/graphql", graphqlHttp({
     schema: graphqlSchema,

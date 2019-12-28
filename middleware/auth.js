@@ -20,8 +20,11 @@ module.exports = async function(req, res, next){
         req.isAuth = false;
         return next();
     }
-
     if(!decodedToken){
+        req.isAuth = false;
+        return next();
+    }
+    if(decodedToken.expiration < new Date().getTime()){
         req.isAuth = false;
         return next();
     }

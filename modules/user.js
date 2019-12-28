@@ -20,11 +20,8 @@ const userSchema = new Schema({
     },
     posts: [
         {
-            postId: {
-                type: Schema.Types.ObjectId,
-                ref: 'Post',
-                required: true
-            }
+            type: Schema.Types.ObjectId,
+            ref: 'Post'
         }
     ], 
 });

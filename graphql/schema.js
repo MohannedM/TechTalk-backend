@@ -14,6 +14,13 @@ module.exports = buildSchema(`
         image: String!
     }
 
+    input UpdatePostInput{
+        _id: ID!
+        title: String!
+        content: String!
+        image: String
+    }
+
     type User{
         _id: ID!
         name: String!
@@ -41,11 +48,14 @@ module.exports = buildSchema(`
         signup(userData: UserInputData): Boolean!
         isEmailTaken(email: String!): Boolean!
         createPost(postInput: PostInputData!): Post!
+        updatePost(postInput: UpdatePostInput!): Post!
     }
 
     type RootQuery{
         login(email: String!, password: String!): authData!
         getUserData(token: String!): User!
+        getUserPosts: [Post!]!
+        getAllPosts: [Post!]!
     }
 
     schema {
