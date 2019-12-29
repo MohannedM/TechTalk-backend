@@ -49,14 +49,19 @@ const fileFilter = (req, file, cb) => {
 app.use(multer({storage, fileFilter}).single('image'));
 
 app.put("/post/add-image", (req,res,next)=>{
-    if(req.isAuth && req.file){
+    if(!req.isAuth){
+        res.status(401).json({message: "Unauthorized"});
+        return;
+    }
+    if(req.file){
         const imageUrl = req.file.path.replace("\\" ,"/");
         imageUrl ? res.status(200).json({imageUrl}) : res.status(400).json({error: "Image upload failed"});
         return; 
     }else if(!req.file){
-        res.status(400).json({message: "An error occured"});
+        res.status(200).json({imageUrl: ''});
+        return;
     }
-    res.status(401).json({message: "Unauthorized"});
+    
 });
 
 app.use("/graphql", graphqlHttp({

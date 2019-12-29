@@ -49,6 +49,7 @@ module.exports = buildSchema(`
         isEmailTaken(email: String!): Boolean!
         createPost(postInput: PostInputData!): Post!
         updatePost(postInput: UpdatePostInput!): Post!
+        deletePost(postId: String!): Boolean!
     }
 
     type RootQuery{

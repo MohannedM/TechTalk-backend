@@ -86,7 +86,7 @@ module.exports = {
             }
         });
     },
-    updatePost: async function({postInput, req}){
+    updatePost: async function({postInput}, req){
         const errors = [];
         if(validator.default.isEmpty(postInput.title) || !validator.default.isLength(postInput.title, {min: 4, max: 25})){
             errors.push({message: "Title should be from 4 to 25 characters"})
@@ -97,17 +97,17 @@ module.exports = {
         }
         
         const exisitingUser = await User.findById(req.userId);
-
+        
         if(!exisitingUser){
             errors.push({message: "Authentication Failed"});
         }
-
+        
         const fetchedPost = await Post.findById(postInput._id).populate("user");
-
+        
         if(!fetchedPost){
             errors.push({message: "Post was not found"});
         }
-
+        
         if(errors.length > 0){
             const error = new Error("Invalid Input");
             error.code = 400;
@@ -116,7 +116,7 @@ module.exports = {
         }
         let postImage;
         if(postInput.image){
-            fs.unlinkSync(path.join(__dirname, fetchedPost.image));
+            fs.unlinkSync(path.join(__dirname,'..','..', fetchedPost.image));
             postImage = postInput.image;
         }else{
             postImage = fetchedPost.image;
@@ -129,11 +129,31 @@ module.exports = {
             ...updatedPost._doc,
             _id: updatedPost._id.toString(),
             creator: {
-                ...fetchedPost.creator._doc,
-                _id :fetchedPost._id.toString()
+                ...exisitingUser._doc,
+                _id: exisitingUser._id.toString()
             },
             createdAt: updatedPost.createdAt.toISOString(),
             updatedAt: updatedPost.updatedAt.toISOString()
         }
+    },
+    deletePost: async function({postId}, req){
+        const errors = [];
+        const exisitingUser = await User.findById(req.userId);
+        if(!exisitingUser){
+            errors.push({message: "Authentication Failed"});
+        }
+        const fetchedPost = await Post.findById(postId);
+        if(!fetchedPost){
+            errors.push({message: "Post was not found"});
+        }
+        if(errors.length > 0){
+            const error = new Error("Invalid Input");
+            error.code = 400;
+            error.data = errors;
+            throw error;
+        }
+        fs.unlinkSync(path.join(__dirname,'..','..', fetchedPost.image));
+        await Post.findByIdAndRemove(postId);
+        return true;
     }
 };

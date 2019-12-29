@@ -28,7 +28,6 @@ module.exports = async function(req, res, next){
         req.isAuth = false;
         return next();
     }
-
     req.isAuth = true;
     req.userId = decodedToken.userId;
     req.is_admin = decodedToken.is_admin;
